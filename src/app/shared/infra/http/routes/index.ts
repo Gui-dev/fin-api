@@ -1,10 +1,10 @@
 import { Router } from 'express'
 
+import { routesAccount } from '@modules/account/infra/http/routes/account.routes'
+
 const routes = Router()
 
-routes.get('/', (req, res) => {
-  return res.json({ res: 'Hello World' })
-})
+routes.use('/accounts', routesAccount)
 
 export {
   routes
