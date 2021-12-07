@@ -7,7 +7,7 @@ const routesAccount = Router()
 const accountController = new AccountController()
 
 routesAccount.get('/', accountController.index)
-routesAccount.get('/statement/:cpf', accountController.show)
+routesAccount.get('/statement', accountController.show)
 routesAccount.post('/', accountController.create)
 
 export {

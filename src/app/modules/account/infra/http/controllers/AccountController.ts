@@ -26,9 +26,9 @@ export class AccountController {
   }
 
   public async show (request: Request, response: Response): Promise<Response> {
-    const { cpf } = request.params
+    const { cpf } = request.headers
     const accountService = new AccountService()
-    const customer = await accountService.listByCpf(cpf)
+    const customer = await accountService.listByCpf(cpf as string)
 
     return response.status(201).json(customer)
   }
