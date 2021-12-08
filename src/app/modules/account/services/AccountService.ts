@@ -4,7 +4,7 @@ type AccountDTO = {
   cpf: string
   statement?: Array<{
     type: string
-    description: string
+    description?: string
     amount: number
     // eslint-disable-next-line camelcase
     created_at: Date
@@ -22,7 +22,7 @@ export class AccountService {
       statement: [{
         type: 'credit',
         description: 'Deposito',
-        amount: 100,
+        amount: 10000,
         created_at: new Date()
       }]
     }]
@@ -65,6 +65,48 @@ export class AccountService {
     const statementOperation = {
       type: 'credit',
       description,
+      amount,
+      created_at: new Date()
+    }
+
+    customer.statement?.push(statementOperation)
+
+    return customer
+  }
+
+  public async balance (cpf: string): Promise<number> {
+    const customer = await this.listByCpf(cpf)
+
+    if (!customer) {
+      throw new Error('Customer not found')
+    }
+
+    const balance = customer.statement?.reduce((acc, operation) => {
+      if (operation.type === 'credit') {
+        return acc + operation.amount
+      } else {
+        return acc - operation.amount
+      }
+    }, 0)
+
+    return Number(balance)
+  }
+
+  public async withdraw (cpf: string, amount: number): Promise<AccountDTO> {
+    const customer = await this.listByCpf(cpf)
+
+    if (!customer) {
+      throw new Error('Customer not found')
+    }
+
+    const balance = await this.balance(customer.cpf)
+
+    if (balance < amount) {
+      throw new Error('Sorry, Insufficient funds')
+    }
+
+    const statementOperation = {
+      type: 'debit',
       amount,
       created_at: new Date()
     }
