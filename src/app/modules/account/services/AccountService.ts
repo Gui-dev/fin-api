@@ -2,7 +2,13 @@ type AccountDTO = {
   id: string
   name: string
   cpf: string
-  statement?: string[]
+  statement?: Array<{
+    type: string
+    description: string
+    amount: number
+    // eslint-disable-next-line camelcase
+    created_at: Date
+  }>
 }
 
 export class AccountService {
@@ -13,7 +19,12 @@ export class AccountService {
       id: 'ef6f2b81-f2ca-44b5-b914-59d40d8dfd57',
       name: 'Clark Kent',
       cpf: '98754326787',
-      statement: []
+      statement: [{
+        type: 'credit',
+        description: 'Deposito',
+        amount: 100,
+        created_at: new Date()
+      }]
     }]
   }
 
@@ -40,6 +51,25 @@ export class AccountService {
     if (!customer) {
       throw new Error('Customer not found')
     }
+
+    return customer
+  }
+
+  public async deposit (cpf: string, description: string, amount: number): Promise<AccountDTO> {
+    const customer = await this.listByCpf(cpf)
+
+    if (!customer) {
+      throw new Error('Customer not found')
+    }
+
+    const statementOperation = {
+      type: 'credit',
+      description,
+      amount,
+      created_at: new Date()
+    }
+
+    customer.statement?.push(statementOperation)
 
     return customer
   }
